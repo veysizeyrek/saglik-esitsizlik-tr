@@ -9,7 +9,7 @@ R + Shiny ile yazılmış interaktif bir panel. İl bazlı TÜİK göstergelerin
 seyrini ülke medyanıyla karşılaştırır.
 
 
-🔗 Canlı demo:** https://veysizeyrek.shinyapps.io/saglik-esitsizlik-tr/ -->
+🔗 Canlı demo: https://veysizeyrek.shinyapps.io/saglik-esitsizlik-tr/ -->
 
 ![Panel ekran görüntüsü](assets/demo.gif)
 
