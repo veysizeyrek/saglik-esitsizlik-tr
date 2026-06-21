@@ -8,11 +8,11 @@ R + Shiny ile yazılmış interaktif bir panel. İl bazlı TÜİK göstergelerin
 üzerinde gösterir, en iyi/en kötü illeri sıralar, seçilen ilin yıllar içindeki
 seyrini ülke medyanıyla karşılaştırır.
 
-<!-- Deploy ettikten sonra: -->
-<!-- **🔗 Canlı demo:** https://veysizeyrek.shinyapps.io/saglik-esitsizlik-tr/ -->
+
+! **🔗 Canlı demo:** https://veysizeyrek.shinyapps.io/saglik-esitsizlik-tr/ -->
 
 ![Panel ekran görüntüsü](assets/demo.gif)
-<!-- assets/demo.gif: uygulamayı çalıştırıp kısa bir ekran kaydı al. -->
+
 
 ---
 
