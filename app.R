@@ -1,6 +1,3 @@
-# app.R
-# Türkiye'de Sağlıkta Bölgesel Eşitsizlik — interaktif Shiny paneli
-# Çalıştırmak için: shiny::runApp()  (bağımlılıklar için README'ye bakın)
 
 library(shiny)
 library(bslib)
@@ -13,26 +10,25 @@ library(DT)
 
 source("R/load_data.R", encoding = "UTF-8")
 
-# --- Veriyi bir kez yükle (uygulama açılışında) -------------------------------
+
 veri    <- load_saglik_data("data/saglik_il.csv")
 poligon <- load_polygons("data/tr_polygons.csv")
 
-# selectInput için "etiket = kod" eşlemesi (kullanıcı etiketi görür, kod döner)
+
 gosterge_df      <- veri |> distinct(gosterge_kodu, gosterge) |> arrange(gosterge)
 gosterge_secenek <- setNames(gosterge_df$gosterge_kodu, gosterge_df$gosterge)
 
-# Her göstergenin TÜİK'te mevcut yılları farklı (ör. yaşam süresi yalnızca
-# 2013,2014,2017,2020,2023). Yıl seçeneği bu yüzden göstergeye göre güncellenir.
+
 yillar_of <- function(kod) sort(unique(veri$yil[veri$gosterge_kodu == kod]), decreasing = TRUE)
 
 varsayilan_gosterge <- if ("hekim_1000" %in% gosterge_secenek) "hekim_1000" else gosterge_secenek[[1]]
 ilk_yillar <- yillar_of(varsayilan_gosterge)
 il_listesi <- sort(unique(veri$il))
 
-# Kırmızı = kötü olacak şekilde tema rengi
+
 KOTU_KIRMIZI <- "#c0392b"; IYI_YESIL <- "#27ae60"; ANA_RENK <- "#1f6f8b"
 
-# ============================= ARAYÜZ =========================================
+
 ui <- page_sidebar(
   title = "Türkiye'de Sağlıkta Bölgesel Eşitsizlik",
   theme = bs_theme(version = 5, bootswatch = "flatly", primary = ANA_RENK),
@@ -52,7 +48,7 @@ ui <- page_sidebar(
     )
   ),
 
-  # Üst KPI kutuları
+
   layout_columns(
     fill = FALSE,
     value_box(
@@ -109,16 +105,16 @@ ui <- page_sidebar(
   )
 )
 
-# ============================= SUNUCU =========================================
+
 server <- function(input, output, session) {
 
-  # Gösterge değişince, o göstergenin mevcut yıllarıyla yıl listesini tazele
+
   observeEvent(input$gosterge, {
     yillar <- yillar_of(input$gosterge)
     updateSelectInput(inputId = "yil", choices = yillar, selected = max(yillar))
   })
 
-  # Seçili gösterge-yıl dilimi (yil seçim kutusundan metin gelir -> integer)
+
   dilim <- reactive({
     req(input$yil)
     veri |> filter(gosterge_kodu == input$gosterge, yil == as.integer(input$yil))
@@ -132,7 +128,7 @@ server <- function(input, output, session) {
   etiket <- reactive(names(gosterge_secenek)[gosterge_secenek == input$gosterge])
   birim  <- reactive(gosterge_meta$birim[gosterge_meta$gosterge_kodu == input$gosterge])
 
-  # --- KPI çıktıları ----------------------------------------------------------
+
   output$kpi_oran <- renderText(sprintf("%.2f kat", ozet()$oran))
   output$kpi_iyi  <- renderText(sprintf("%s (%.1f)", ozet()$en_iyi$il,  ozet()$en_iyi$deger))
   output$kpi_kotu <- renderText(sprintf("%s (%.1f)", ozet()$en_kotu$il, ozet()$en_kotu$deger))
@@ -142,12 +138,11 @@ server <- function(input, output, session) {
             etiket(), input$yil, birim())
   })
 
-  # --- Harita (plotly: interaktif ama sf/leaflet/terra gerektirmez) -----------
   output$harita <- renderPlotly({
     req(nrow(dilim()) > 0)
     hd <- poligon |> left_join(dilim(), by = "il")
     yon <- gosterge_yonu(input$gosterge)
-    yon_dir <- if (yon == "yuksek_iyi") -1 else 1   # kötü = koyu kırmızı
+    yon_dir <- if (yon == "yuksek_iyi") -1 else 1  
 
     g <- ggplot(hd, aes(long, lat, group = grup, fill = deger,
                         text = paste0(il, ": ", deger, " ", birim()))) +
@@ -161,13 +156,13 @@ server <- function(input, output, session) {
       layout(margin = list(l = 0, r = 0, t = 0, b = 0))
   })
 
-  # --- Sıralama (en iyi 10 + en kötü 10) --------------------------------------
+
   output$siralama <- renderPlot({
     df  <- dilim()
     req(nrow(df) > 0)
     yon <- gosterge_yonu(input$gosterge)
     sirali <- if (yon == "yuksek_iyi") arrange(df, deger) else arrange(df, desc(deger))
-    # baştaki 10 = en kötü, sondaki 10 = en iyi
+
     sec <- bind_rows(
       head(sirali, 10) |> mutate(grup = "En kötü 10"),
       tail(sirali, 10) |> mutate(grup = "En iyi 10")
@@ -183,7 +178,7 @@ server <- function(input, output, session) {
       theme(legend.position = "top")
   })
 
-  # --- Eğilim (seçili il vs ülke medyanı) -------------------------------------
+
   output$egilim <- renderPlot({
     g <- input$gosterge
     ulusal <- veri |>
@@ -205,7 +200,7 @@ server <- function(input, output, session) {
       theme_minimal(base_size = 13)
   })
 
-  # --- Veri tablosu + indirme -------------------------------------------------
+ 
   genis_tablo <- reactive({
     req(input$yil)
     veri |>
