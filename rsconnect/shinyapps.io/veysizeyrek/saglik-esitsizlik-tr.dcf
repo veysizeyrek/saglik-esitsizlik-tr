@@ -1,0 +1,12 @@
+name: saglik-esitsizlik-tr
+title: saglik-esitsizlik-tr
+username: veysizeyrek
+account: veysizeyrek
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 17535356
+bundleId: 12157289
+url: https://veysizeyrek.shinyapps.io/saglik-esitsizlik-tr/
+version: 1
+asMultiple: FALSE
+asStatic: FALSE
