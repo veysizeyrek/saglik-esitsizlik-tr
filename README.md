@@ -9,7 +9,7 @@ R + Shiny ile yazılmış interaktif bir panel. İl bazlı TÜİK göstergelerin
 seyrini ülke medyanıyla karşılaştırır.
 
 <!-- Deploy ettikten sonra: -->
-<!-- **🔗 Canlı demo:** https://KULLANICI.shinyapps.io/saglik-esitsizlik-tr -->
+<!-- **🔗 Canlı demo:** https://veysizeyrek.shinyapps.io/saglik-esitsizlik-tr/ -->
 
 ![Panel ekran görüntüsü](assets/demo.gif)
 <!-- assets/demo.gif: uygulamayı çalıştırıp kısa bir ekran kaydı al. -->
@@ -52,62 +52,5 @@ yanlış olurdu.
 İl sınırları (`geo/tr-iller.geojson`):
 [alpers/Turkey-Maps-GeoJSON](https://github.com/alpers/Turkey-Maps-GeoJSON), Apache-2.0.
 
-## Veri hattı (yeniden üretilebilir)
-
-```r
-source("data-raw/prepare_data.R")   # data-raw/*.xls -> data/saglik_il.csv
-```
-
-`prepare_data.R` ham TÜİK pivot tablolarını tek bir tidy dosyaya çevirir
-(il, yıl, gösterge, değer). İl adları harita GeoJSON'ı ile birebir eşitlenir
-(ör. "Afyonkarahisar" → "Afyon"). Yeni gösterge eklemek için tek bir okuma bloğu
-ekleyip betiği yeniden çalıştırman yeterli; uygulama kodu değişmez.
-
-## Kurulum ve çalıştırma
-
-```r
-install.packages(c(
-  "shiny", "bslib", "dplyr", "tidyr", "readr", "ggplot2", "plotly", "scales", "DT",
-  "readxl", "jsonlite", "stringr"   # son üçü yalnızca prepare_data.R için
-))
-shiny::runApp()
-```
-
-> Harita, `sf`/`leaflet` yerine düz koordinat tablosundan (`data/tr_polygons.csv`)
-> `ggplot2` ile çizilip `plotly` ile interaktif hale getirilir (il üstüne gelince
-> etiket, zoom, kaydırma). Böylece harici sistem kütüphanesi (GDAL/GEOS) ve
-> `terra`/`raster` derlemesi gerekmez — yerelde ve shinyapps.io'da sorunsuz kurulur.
-
-## shinyapps.io'ya deploy (ücretsiz)
-
-```r
-install.packages("rsconnect")
-rsconnect::setAccountInfo(name = "...", token = "...", secret = "...")
-rsconnect::deployApp(appName = "saglik-esitsizlik-tr")
-```
-
-
-## Proje yapısı
-
-```
-saglik-esitsizlik-tr/
-├── app.R                     # Shiny arayüz + sunucu
-├── R/
-│   └── load_data.R           # veri yükleme, gösterge meta, eşitsizlik özeti
-├── data/
-│   ├── saglik_il.csv         # tidy veri (gerçek TÜİK)
-│   └── tr_polygons.csv       # il sınırı koordinatları (ggplot haritası için)
-├── data-raw/
-│   ├── prepare_data.R              # ham xls/xlsx -> tidy csv
-│   ├── tuik-hekim-yatak-dogum-olum.xls
-│   ├── tuik-dogusta-yasam-suresi.xls
-│   └── tuik-il-nufus.xlsx          # yatağı bin kişiye normalize için
-├── geo/
-│   └── tr-iller.geojson       # 81 il sınırı (Apache-2.0)
-├── assets/                    # ekran görüntüsü / GIF
-└── README.md
-```
-
-## Lisans
 
 Kod: MIT. Veri: TÜİK (kamuya açık). Harita verisi: Apache-2.0 (yukarıdaki atıf).
